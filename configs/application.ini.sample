@@ -1,0 +1,3 @@
+[BanRegBotHelper]
+nginx_log_file = ''
+denied_ip_auto_conf = ''

@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+from happy_python import HappyConfigBase
+
+
+class ApplicationConfig(HappyConfigBase):
+    def __init__(self):
+        super().__init__()
+
+        self.section = 'BanRegBotHelper'
+        self.nginx_log_file = ''
+        self.denied_ip_auto_conf = ''
