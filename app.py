@@ -6,10 +6,13 @@ import re
 from utils import parser_log
 from datetime import datetime
 from common import hlog, config
+import shutil
 
 hlog = hlog
 
 ip_emails = {}
+old_denied_ips_len = 0
+new_denied_ips_len = 0
 
 
 class RequestData:
@@ -35,6 +38,9 @@ class RequestData:
 
 def analyze_log_files(log_file: str, old_denied_ips: dict) -> dict:
     global ip_emails
+    global old_denied_ips_len
+    global new_denied_ips_len
+    old_denied_ips_len = len(old_denied_ips)
     register_list = []
     ip_counts = {}
     # 存储提取的HTTP请求段
@@ -45,7 +51,7 @@ def analyze_log_files(log_file: str, old_denied_ips: dict) -> dict:
     parser_log(log_file)
 
     # 从文件中读取日志内容
-    with open('/tmp/nginx_parse.log', 'r', encoding='UTF-8') as file:
+    with open('tmp/nginx_parse.log', 'r', encoding='UTF-8') as file:
         log_content = file.readlines()
 
     # 遍历日志内容的每一行
@@ -121,8 +127,9 @@ def analyze_log_files(log_file: str, old_denied_ips: dict) -> dict:
         request_count = ip_counts.get(ip_address)
 
         if request_count >= 3 and (company == "google" or address_1 == address_2 == city):
+            # 统计本次封禁IP的数量
             old_denied_ips[ip_address] = ip_address
-
+    new_denied_ips_len = len(old_denied_ips) - old_denied_ips_len
     return old_denied_ips
 
 
@@ -141,10 +148,18 @@ def load_denied_ip_auto_conf(file: str) -> dict:
     return denied_ips
 
 
+def get_emails_from_dict(dictionary: dict, key: str) -> str | list:
+    value = dictionary.get(key)
+    if value is None:
+        return "added"
+    else:
+        return value
+
+
 def dump_denied_ip_auto_conf(denied_ips: dict):
     with open(config.denied_ip_auto_conf, mode='w', encoding='UTF-8') as f:
         for k, v in denied_ips.items():
-            hlog.info('deny ip->%s %s' % (k, ip_emails.get(k)))
+            hlog.info('deny ip->%s %s' % (k, get_emails_from_dict(ip_emails, k)))
             f.write('deny %s;' % k + '\n')
 
 
@@ -157,9 +172,9 @@ def main():
 
     dump_denied_ip_auto_conf(new_denied_ips)
 
-    os.remove('/tmp/nginx_parse.log')
-    os.remove('/tmp/nginx_decode.log')
-    os.remove('/tmp/decode_post.log')
+    hlog.info('The newly IP added number %s' % new_denied_ips_len)
+
+    # shutil.rmtree('tmp')
 
 
 if __name__ == '__main__':

@@ -1,3 +1,6 @@
 __pycache__
 *.ini
 .idea
+*.log
+tmp
+denied_ip_auto.conf
