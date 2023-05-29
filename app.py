@@ -174,7 +174,7 @@ def main():
 
     hlog.info('The newly IP added number %s' % new_denied_ips_len)
 
-    # shutil.rmtree('tmp')
+    shutil.rmtree('tmp')
 
 
 if __name__ == '__main__':
