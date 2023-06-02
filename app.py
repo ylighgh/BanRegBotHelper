@@ -51,7 +51,7 @@ def analyze_log_files(log_file: str, old_denied_ips: dict) -> dict:
     parser_log(log_file)
 
     # 从文件中读取日志内容
-    with open('tmp/nginx_parse.log', 'r', encoding='UTF-8') as file:
+    with open('cache/nginx_parse.log', 'r', encoding='UTF-8') as file:
         log_content = file.readlines()
 
     # 遍历日志内容的每一行
@@ -174,7 +174,7 @@ def main():
 
     hlog.info('The newly IP added number %s' % new_denied_ips_len)
 
-    shutil.rmtree('tmp')
+    shutil.rmtree('cache')
 
 
 if __name__ == '__main__':

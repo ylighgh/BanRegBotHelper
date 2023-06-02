@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-import os
 from urllib.parse import unquote
 from pathlib import Path
 import shutil
@@ -8,7 +7,7 @@ import shutil
 
 def read_nginx_post_log(nginx_log: str):
     search_string = "/index.php?route=account/register"
-    with open(nginx_log, mode='r', encoding='UTF-8') as f, open('tmp/nginx_decode.log', mode='w',
+    with open(nginx_log, mode='r', encoding='UTF-8') as f, open('cache/nginx_decode.log', mode='w',
                                                                 encoding='UTF-8') as f2:
         lines = f.readlines()
         for line in lines:
@@ -17,8 +16,8 @@ def read_nginx_post_log(nginx_log: str):
 
 
 def decode_nginx_post_log() -> None:
-    with open('tmp/decode_post.log', mode='w', encoding='UTF-8') as f, open('tmp/nginx_decode.log', mode='r',
-                                                                            encoding='UTF-8') as f2:
+    with open('cache/decode_post.log', mode='w', encoding='UTF-8') as f, open('cache/nginx_decode.log', mode='r',
+                                                                              encoding='UTF-8') as f2:
         decode_data = unquote(f2.read())
         f.write(decode_data)
 
@@ -31,7 +30,7 @@ def remove_log_blank_line(input_file: str, output_file: str):
 
 
 def parser_log(nginx_log: str):
-    my_file = Path("tmp")
+    my_file = Path("cache")
     if my_file.is_dir():
         shutil.rmtree(my_file)
         my_file.mkdir()
@@ -39,4 +38,4 @@ def parser_log(nginx_log: str):
         my_file.mkdir()
     read_nginx_post_log(nginx_log)
     decode_nginx_post_log()
-    remove_log_blank_line('tmp/decode_post.log', 'tmp/nginx_parse.log')
+    remove_log_blank_line('cache/decode_post.log', 'cache/nginx_parse.log')
